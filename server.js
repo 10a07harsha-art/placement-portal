@@ -7,12 +7,18 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const Job = require("./models/Job");
 const User = require("./models/User");
 const Application = require("./models/Application");
 
 const app = express();
+const uploadsDir = path.join(__dirname, "uploads");
+
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 app.use(cors({ origin: "*" }));
 app.use(express.json());
@@ -24,7 +30,7 @@ mongoose.connect("mongodb+srv://admin:admin123@cluster0.yjatrvj.mongodb.net/plac
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/");
+        cb(null, uploadsDir);
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + path.extname(file.originalname));

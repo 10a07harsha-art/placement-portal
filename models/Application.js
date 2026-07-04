@@ -8,6 +8,14 @@ const applicationSchema = new mongoose.Schema({
     jobId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Job"
+    },
+    resume: {
+        type: String,
+        default: ""
+    },
+    status: {
+        type: String,
+        default: "Pending"
     }
 });
 
