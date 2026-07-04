@@ -15,6 +15,10 @@ const Application = require("./models/Application");
 
 const app = express();
 const uploadsDir = path.join(__dirname, "uploads");
+const mongoUri =
+    process.env.MONGODB_URI ||
+    "mongodb+srv://admin:admin123@cluster0.yjatrvj.mongodb.net/placementDB";
+const jwtSecret = process.env.JWT_SECRET || "secretkey";
 
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
@@ -24,7 +28,7 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
-mongoose.connect("mongodb+srv://admin:admin123@cluster0.yjatrvj.mongodb.net/placementDB")
+mongoose.connect(mongoUri)
 .then(() => console.log("MongoDB Atlas Connected"))
 .catch(err => console.log(err));
 
@@ -45,7 +49,7 @@ const verifyToken = (req, res, next) => {
     if (!token) return res.status(403).json({ message: "Token required" });
 
     try {
-        const decoded = jwt.verify(token, "secretkey");
+        const decoded = jwt.verify(token, jwtSecret);
         req.user = decoded;
         next();
     } catch {
@@ -124,7 +128,7 @@ app.post("/login", async (req, res) => {
 
         const token = jwt.sign(
             { userId: user._id, name: user.name, role: user.role },
-            "secretkey",
+            jwtSecret,
             { expiresIn: "1h" }
         );
 

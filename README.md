@@ -24,3 +24,5 @@ Open `http://localhost:3000`.
 - The backend exposes `GET /seed-jobs` to create demo roles.
 - The frontend is served from `index.html` by `server.js`.
 - GitHub Pages is not suitable for the live portal because the app depends on backend routes.
+- Use Render as the live host for this repository so the Express API and the single-page frontend stay on the same origin.
+- Set `MONGODB_URI` and `JWT_SECRET` in Render before deploying.
