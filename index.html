@@ -667,6 +667,40 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script>
+      const demoSeedJobs = [
+        {
+          _id: 'demo-frontend',
+          title: 'Frontend Developer',
+          company: 'Google',
+          location: 'Bangalore',
+          salary: 'Competitive',
+          description: 'Build UI using React'
+        },
+        {
+          _id: 'demo-backend',
+          title: 'Backend Developer',
+          company: 'Amazon',
+          location: 'Hyderabad',
+          salary: 'Competitive',
+          description: 'Develop APIs using Node.js'
+        },
+        {
+          _id: 'demo-fullstack',
+          title: 'Full Stack Engineer',
+          company: 'Microsoft',
+          location: 'Pune',
+          salary: 'Competitive',
+          description: 'Full stack development'
+        }
+      ];
+
+      const LOCAL_KEYS = {
+        jobs: 'placement_portal_local_jobs',
+        users: 'placement_portal_local_users',
+        applications: 'placement_portal_local_applications',
+        token: 'placement_portal_local_token'
+      };
+
       const state = {
         jobs: [],
         applications: [],
@@ -685,6 +719,7 @@
           students: 0,
           applications: 0
         },
+        mode: 'api',
         token: localStorage.getItem('placement_portal_token') || ''
       };
 
@@ -722,6 +757,44 @@
         toastTimer = window.setTimeout(() => {
           els.toast.classList.remove('is-visible');
         }, 2400);
+      }
+
+      function readStore(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch {
+          return fallback;
+        }
+      }
+
+      function writeStore(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function localUsers() {
+        return readStore(LOCAL_KEYS.users, []);
+      }
+
+      function localJobs() {
+        return readStore(LOCAL_KEYS.jobs, demoSeedJobs);
+      }
+
+      function localApplications() {
+        return readStore(LOCAL_KEYS.applications, []);
+      }
+
+      function localUserEmail() {
+        return localStorage.getItem(LOCAL_KEYS.token) || '';
+      }
+
+      function setDemoMode(reason) {
+        state.mode = 'demo';
+        if (reason) {
+          setStatus(`Demo mode active. ${reason}`, 'warn');
+        } else {
+          setStatus('Demo mode active. Backend unavailable, using in-browser data.', 'warn');
+        }
       }
 
       function animateMetric(key, target, element) {
@@ -763,12 +836,121 @@
         els.impactBar.style.transform = `scaleX(${0.2 + ratio * 0.8})`;
       }
 
+      function localStats() {
+        const jobs = localJobs().length;
+        const users = localUsers();
+        const applications = localApplications().length;
+        return {
+          jobs,
+          students: users.filter((user) => user.role === 'student').length,
+          applications
+        };
+      }
+
+      function localLoadJobs({ seedIfEmpty = true } = {}) {
+        const jobs = localJobs();
+        if (!jobs.length && seedIfEmpty) {
+          writeStore(LOCAL_KEYS.jobs, demoSeedJobs);
+          state.jobs = demoSeedJobs;
+        } else {
+          state.jobs = jobs;
+        }
+        state.stats = localStats();
+        syncImpactMetrics();
+        renderJobs();
+        renderApplications();
+        setDemoMode('Jobs are being served from local demo data.');
+      }
+
+      function localLoadApplications() {
+        const userEmail = localUserEmail();
+        if (!userEmail) {
+          state.applications = [];
+        } else {
+          state.applications = localApplications()
+            .filter((item) => item.userEmail === userEmail)
+            .map((item) => ({
+              ...item,
+              jobId: item.jobSnapshot
+            }));
+        }
+        state.stats = localStats();
+        syncImpactMetrics();
+        renderApplications();
+      }
+
+      function localSignup(payload) {
+        const users = localUsers();
+        if (users.some((user) => user.email === payload.email)) {
+          throw new Error('User already exists');
+        }
+
+        const user = {
+          name: `${payload.firstName} ${payload.lastName}`.toUpperCase(),
+          email: payload.email,
+          password: payload.password,
+          phone: payload.phone || '',
+          role: 'student'
+        };
+
+        writeStore(LOCAL_KEYS.users, [...users, user]);
+        state.stats = localStats();
+        syncImpactMetrics();
+        return { message: 'Signup successful' };
+      }
+
+      function localLogin(payload) {
+        const user = localUsers().find((entry) => entry.email === payload.email);
+        if (!user) throw new Error('User not found');
+        if (user.password !== payload.password) throw new Error('Wrong password');
+        saveToken(user.email);
+        return { token: user.email };
+      }
+
+      function localApply(jobId, resumeFile) {
+        const userEmail = localUserEmail();
+        if (!userEmail) {
+          throw new Error('Token required');
+        }
+
+        const applications = localApplications();
+        if (applications.some((item) => item.userEmail === userEmail && item.jobId === jobId)) {
+          return { message: 'Already applied' };
+        }
+
+        const job = state.jobs.find((item) => item._id === jobId);
+        const app = {
+          _id: `local-${Date.now()}`,
+          userEmail,
+          jobId,
+          jobSnapshot: job
+            ? {
+                _id: job._id,
+                title: job.title,
+                company: job.company,
+                location: job.location,
+                salary: job.salary,
+                description: job.description
+              }
+            : null,
+          resume: resumeFile ? resumeFile.name : '',
+          status: 'Pending'
+        };
+
+        writeStore(LOCAL_KEYS.applications, [...applications, app]);
+        state.stats = localStats();
+        syncImpactMetrics();
+        return { message: 'Applied successfully' };
+      }
+
       function saveToken(token) {
         state.token = token;
         if (token) {
           localStorage.setItem('placement_portal_token', token);
+          localStorage.setItem(LOCAL_KEYS.token, token);
         } else {
           localStorage.removeItem('placement_portal_token');
+          localStorage.removeItem(LOCAL_KEYS.token);
         }
         syncSession();
         renderJobs();
@@ -777,10 +959,15 @@
 
       function syncSession() {
         if (state.token) {
-          els.sessionState.textContent = 'Logged in.';
-          setStatus('Logged in and ready to apply.', 'info');
+          els.sessionState.textContent = state.mode === 'demo' ? 'Logged in. Demo mode.' : 'Logged in.';
+          setStatus(
+            state.mode === 'demo'
+              ? 'Logged in and ready to apply in demo mode.'
+              : 'Logged in and ready to apply.',
+            'info'
+          );
         } else {
-          els.sessionState.textContent = 'Guest mode.';
+          els.sessionState.textContent = state.mode === 'demo' ? 'Guest mode. Demo mode.' : 'Guest mode.';
         }
       }
 
@@ -905,12 +1092,21 @@
       }
 
       async function loadStats() {
-        state.stats = await api('/stats');
+        if (state.mode === 'demo') {
+          state.stats = localStats();
+        } else {
+          state.stats = await api('/stats');
+        }
         syncImpactMetrics();
       }
 
       async function loadJobs({ autoSeed = true } = {}) {
         try {
+          if (state.mode === 'demo') {
+            localLoadJobs({ seedIfEmpty: autoSeed });
+            return;
+          }
+
           state.jobs = await api('/jobs');
           await loadStats();
           if (!state.jobs.length && autoSeed) {
@@ -923,13 +1119,8 @@
           renderApplications();
           setStatus(state.jobs.length ? 'Jobs loaded successfully.' : 'No jobs available yet.', 'info');
         } catch (error) {
-          setStatus(`Failed to load jobs: ${error.message}`, 'error');
-          showToast(error.message);
-          els.jobsGrid.innerHTML = `
-            <div class="empty-state">
-              Could not load jobs. Check the backend connection and try again.
-            </div>
-          `;
+          setDemoMode(error.message);
+          localLoadJobs({ seedIfEmpty: autoSeed });
         }
       }
 
@@ -941,12 +1132,16 @@
         }
 
         try {
+          if (state.mode === 'demo') {
+            localLoadApplications();
+            return;
+          }
+
           state.applications = await api('/my-applications');
           renderApplications();
         } catch (error) {
-          state.applications = [];
-          renderApplications();
-          showToast(error.message);
+          setDemoMode(error.message);
+          localLoadApplications();
         }
       }
 
@@ -956,15 +1151,26 @@
         const payload = Object.fromEntries(formData.entries());
 
         try {
-          const result = await api('/signup', {
-            method: 'POST',
-            body: JSON.stringify(payload)
-          });
+          const result =
+            state.mode === 'demo'
+              ? localSignup(payload)
+              : await api('/signup', {
+                  method: 'POST',
+                  body: JSON.stringify(payload)
+                });
           showToast(result.message || 'Signup complete');
           event.currentTarget.reset();
           await loadStats();
         } catch (error) {
-          showToast(error.message);
+          setDemoMode(error.message);
+          try {
+            const result = localSignup(payload);
+            showToast(result.message || 'Signup complete');
+            event.currentTarget.reset();
+            await loadStats();
+          } catch (localError) {
+            showToast(localError.message);
+          }
         }
       }
 
@@ -974,15 +1180,26 @@
         const payload = Object.fromEntries(formData.entries());
 
         try {
-          const result = await api('/login', {
-            method: 'POST',
-            body: JSON.stringify(payload)
-          });
+          const result =
+            state.mode === 'demo'
+              ? localLogin(payload)
+              : await api('/login', {
+                  method: 'POST',
+                  body: JSON.stringify(payload)
+                });
           saveToken(result.token);
           showToast('Logged in successfully');
           await loadApplications();
         } catch (error) {
-          showToast(error.message);
+          setDemoMode(error.message);
+          try {
+            const result = localLogin(payload);
+            saveToken(result.token);
+            showToast('Logged in successfully');
+            await loadApplications();
+          } catch (localError) {
+            showToast(localError.message);
+          }
         }
       }
 
@@ -998,27 +1215,48 @@
         }
 
         try {
-          const result = await api('/apply-job', {
-            method: 'POST',
-            body: formData
-          });
+          const result =
+            state.mode === 'demo'
+              ? localApply(jobId, fileInput?.files?.[0])
+              : await api('/apply-job', {
+                  method: 'POST',
+                  body: formData
+                });
           showToast(result.message || 'Applied successfully');
           await loadApplications();
           await loadStats();
         } catch (error) {
-          showToast(error.message);
+          setDemoMode(error.message);
+          try {
+            const result = localApply(jobId, fileInput?.files?.[0]);
+            showToast(result.message || 'Applied successfully');
+            await loadApplications();
+            await loadStats();
+          } catch (localError) {
+            showToast(localError.message);
+          }
         }
       }
 
       function bindControls() {
         els.seedDemoBtn.addEventListener('click', async () => {
           try {
+            if (state.mode === 'demo') {
+              writeStore(LOCAL_KEYS.jobs, demoSeedJobs);
+              localLoadJobs({ seedIfEmpty: false });
+              showToast('Demo jobs loaded');
+              return;
+            }
+
             setStatus('Seeding demo jobs...', 'warn');
             await api('/seed-jobs');
             await loadJobs({ autoSeed: false });
             showToast('Demo jobs loaded');
           } catch (error) {
-            showToast(error.message);
+            setDemoMode(error.message);
+            writeStore(LOCAL_KEYS.jobs, demoSeedJobs);
+            localLoadJobs({ seedIfEmpty: false });
+            showToast('Demo jobs loaded');
           }
         });
 
@@ -1042,8 +1280,11 @@
       bindControls();
       syncSession();
       renderApplications();
-      loadJobs();
-      loadApplications();
+      loadJobs().then(() => {
+        if (state.token) {
+          loadApplications();
+        }
+      });
     </script>
   </body>
 </html>
