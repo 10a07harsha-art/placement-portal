@@ -140,6 +140,20 @@ app.get("/jobs", async (req, res) => {
     res.json(jobs);
 });
 
+app.get("/stats", async (req, res) => {
+    const [jobs, students, applications] = await Promise.all([
+        Job.countDocuments(),
+        User.countDocuments({ role: "student" }),
+        Application.countDocuments()
+    ]);
+
+    res.json({
+        jobs,
+        students,
+        applications
+    });
+});
+
 app.post("/apply-job", verifyToken, upload.single("resume"), async (req, res) => {
     try {
         const { jobId } = req.body;

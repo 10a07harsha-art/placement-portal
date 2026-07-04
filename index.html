@@ -470,16 +470,16 @@
                 <span>Open jobs</span>
               </div>
               <div class="metric">
-                <strong id="appsCount">0</strong>
-                <span>My applications</span>
+                <strong id="studentCount">0</strong>
+                <span>Students</span>
               </div>
               <div class="metric">
-                <strong>1-click</strong>
-                <span>Resume upload</span>
+                <strong id="appsCount">0</strong>
+                <span>Applications</span>
               </div>
               <div class="metric">
                 <strong>Live</strong>
-                <span>API-backed board</span>
+                <span>Impact dashboard</span>
               </div>
             </div>
             <div class="status">
@@ -608,6 +608,11 @@
       const state = {
         jobs: [],
         applications: [],
+        stats: {
+          jobs: 0,
+          students: 0,
+          applications: 0
+        },
         token: localStorage.getItem('placement_portal_token') || ''
       };
 
@@ -615,6 +620,7 @@
         jobsGrid: document.getElementById('jobsGrid'),
         applicationsGrid: document.getElementById('applicationsGrid'),
         jobsCount: document.getElementById('jobsCount'),
+        studentCount: document.getElementById('studentCount'),
         appsCount: document.getElementById('appsCount'),
         sessionState: document.getElementById('sessionState'),
         statusBar: document.getElementById('statusBar'),
@@ -749,7 +755,7 @@
       }
 
       function renderJobs() {
-        els.jobsCount.textContent = String(state.jobs.length);
+        els.jobsCount.textContent = String(state.stats.jobs);
         if (!state.jobs.length) {
           els.jobsGrid.innerHTML = `
             <div class="empty-state">
@@ -766,7 +772,8 @@
       }
 
       function renderApplications() {
-        els.appsCount.textContent = String(state.applications.length);
+        els.appsCount.textContent = String(state.stats.applications);
+        els.studentCount.textContent = String(state.stats.students);
         if (!state.token) {
           els.applicationsGrid.innerHTML = `
             <div class="empty-state">
@@ -788,15 +795,24 @@
         els.applicationsGrid.innerHTML = state.applications.map(applicationCard).join('');
       }
 
+      async function loadStats() {
+        state.stats = await api('/stats');
+        renderJobs();
+        renderApplications();
+      }
+
       async function loadJobs({ autoSeed = true } = {}) {
         try {
           state.jobs = await api('/jobs');
+          await loadStats();
           if (!state.jobs.length && autoSeed) {
             setStatus('No jobs yet. Seeding demo roles so the portal is usable.', 'warn');
             await api('/seed-jobs');
             state.jobs = await api('/jobs');
+            await loadStats();
           }
           renderJobs();
+          renderApplications();
           setStatus(state.jobs.length ? 'Jobs loaded successfully.' : 'No jobs available yet.', 'info');
         } catch (error) {
           setStatus(`Failed to load jobs: ${error.message}`, 'error');
@@ -838,6 +854,7 @@
           });
           showToast(result.message || 'Signup complete');
           event.currentTarget.reset();
+          await loadStats();
         } catch (error) {
           showToast(error.message);
         }
@@ -879,6 +896,7 @@
           });
           showToast(result.message || 'Applied successfully');
           await loadApplications();
+          await loadStats();
         } catch (error) {
           showToast(error.message);
         }
