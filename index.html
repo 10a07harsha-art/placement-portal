@@ -197,6 +197,58 @@
         gap: 16px;
       }
 
+      .impact-strip {
+        display: grid;
+        gap: 14px;
+      }
+
+      .impact-strip__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .impact-strip__bar {
+        height: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--border);
+      }
+
+      .impact-strip__bar span {
+        display: block;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        transform-origin: left center;
+      }
+
+      .impact-tiles {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .impact-tile {
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .impact-tile strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 1.35rem;
+      }
+
+      .impact-tile span {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
       .metric {
         padding: 20px;
       }
@@ -464,22 +516,30 @@
           </div>
 
           <div class="hero-grid">
-            <div class="panel metric-grid">
-              <div class="metric">
-                <strong id="jobsCount">0</strong>
-                <span>Open jobs</span>
+            <div class="panel impact-strip">
+              <div class="impact-strip__header">
+                <div>
+                  <div class="eyebrow">Live impact</div>
+                  <h2 style="margin: 12px 0 0; font-size: 1.5rem;">Real numbers from the portal</h2>
+                </div>
+                <div class="pill pill--accent">Auto-refreshes from API</div>
               </div>
-              <div class="metric">
-                <strong id="studentCount">0</strong>
-                <span>Students</span>
+              <div class="impact-tiles">
+                <div class="impact-tile">
+                  <strong id="jobsCount">0</strong>
+                  <span>Open jobs</span>
+                </div>
+                <div class="impact-tile">
+                  <strong id="studentCount">0</strong>
+                  <span>Students</span>
+                </div>
+                <div class="impact-tile">
+                  <strong id="appsCount">0</strong>
+                  <span>Applications</span>
+                </div>
               </div>
-              <div class="metric">
-                <strong id="appsCount">0</strong>
-                <span>Applications</span>
-              </div>
-              <div class="metric">
-                <strong>Live</strong>
-                <span>Impact dashboard</span>
+              <div class="impact-strip__bar" aria-hidden="true">
+                <span id="impactBar"></span>
               </div>
             </div>
             <div class="status">
@@ -622,6 +682,7 @@
         jobsCount: document.getElementById('jobsCount'),
         studentCount: document.getElementById('studentCount'),
         appsCount: document.getElementById('appsCount'),
+        impactBar: document.getElementById('impactBar'),
         sessionState: document.getElementById('sessionState'),
         statusBar: document.getElementById('statusBar'),
         toast: document.getElementById('toast'),
@@ -756,6 +817,9 @@
 
       function renderJobs() {
         els.jobsCount.textContent = String(state.stats.jobs);
+        const total = Math.max(state.stats.jobs + state.stats.students + state.stats.applications, 1);
+        const ratio = Math.min(1, (state.stats.jobs + state.stats.applications) / total);
+        els.impactBar.style.transform = `scaleX(${0.2 + ratio * 0.8})`;
         if (!state.jobs.length) {
           els.jobsGrid.innerHTML = `
             <div class="empty-state">
@@ -774,6 +838,9 @@
       function renderApplications() {
         els.appsCount.textContent = String(state.stats.applications);
         els.studentCount.textContent = String(state.stats.students);
+        const total = Math.max(state.stats.jobs + state.stats.students + state.stats.applications, 1);
+        const ratio = Math.min(1, (state.stats.students + state.stats.applications) / total);
+        els.impactBar.style.transform = `scaleX(${0.2 + ratio * 0.8})`;
         if (!state.token) {
           els.applicationsGrid.innerHTML = `
             <div class="empty-state">
