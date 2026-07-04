@@ -223,6 +223,8 @@
         width: 100%;
         background: linear-gradient(90deg, var(--accent), var(--accent-2));
         transform-origin: left center;
+        transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
       }
 
       .impact-tiles {
@@ -673,6 +675,16 @@
           students: 0,
           applications: 0
         },
+        displayedStats: {
+          jobs: 0,
+          students: 0,
+          applications: 0
+        },
+        impactAnimationIds: {
+          jobs: 0,
+          students: 0,
+          applications: 0
+        },
         token: localStorage.getItem('placement_portal_token') || ''
       };
 
@@ -710,6 +722,45 @@
         toastTimer = window.setTimeout(() => {
           els.toast.classList.remove('is-visible');
         }, 2400);
+      }
+
+      function animateMetric(key, target, element) {
+        window.cancelAnimationFrame(state.impactAnimationIds[key]);
+
+        const start = state.displayedStats[key] || 0;
+        const duration = 900;
+        const startedAt = performance.now();
+
+        if (start === target) {
+          element.textContent = String(target);
+          state.displayedStats[key] = target;
+          return;
+        }
+
+        const tick = (now) => {
+          const progress = Math.min(1, (now - startedAt) / duration);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const value = Math.round(start + (target - start) * eased);
+          element.textContent = String(value);
+
+          if (progress < 1) {
+            state.impactAnimationIds[key] = window.requestAnimationFrame(tick);
+          } else {
+            state.displayedStats[key] = target;
+          }
+        };
+
+        state.impactAnimationIds[key] = window.requestAnimationFrame(tick);
+      }
+
+      function syncImpactMetrics() {
+        animateMetric('jobs', state.stats.jobs, els.jobsCount);
+        animateMetric('students', state.stats.students, els.studentCount);
+        animateMetric('applications', state.stats.applications, els.appsCount);
+
+        const total = Math.max(state.stats.jobs + state.stats.students + state.stats.applications, 1);
+        const ratio = Math.min(1, (state.stats.jobs + state.stats.applications) / total);
+        els.impactBar.style.transform = `scaleX(${0.2 + ratio * 0.8})`;
       }
 
       function saveToken(token) {
@@ -816,10 +867,6 @@
       }
 
       function renderJobs() {
-        els.jobsCount.textContent = String(state.stats.jobs);
-        const total = Math.max(state.stats.jobs + state.stats.students + state.stats.applications, 1);
-        const ratio = Math.min(1, (state.stats.jobs + state.stats.applications) / total);
-        els.impactBar.style.transform = `scaleX(${0.2 + ratio * 0.8})`;
         if (!state.jobs.length) {
           els.jobsGrid.innerHTML = `
             <div class="empty-state">
@@ -836,11 +883,6 @@
       }
 
       function renderApplications() {
-        els.appsCount.textContent = String(state.stats.applications);
-        els.studentCount.textContent = String(state.stats.students);
-        const total = Math.max(state.stats.jobs + state.stats.students + state.stats.applications, 1);
-        const ratio = Math.min(1, (state.stats.students + state.stats.applications) / total);
-        els.impactBar.style.transform = `scaleX(${0.2 + ratio * 0.8})`;
         if (!state.token) {
           els.applicationsGrid.innerHTML = `
             <div class="empty-state">
@@ -864,8 +906,7 @@
 
       async function loadStats() {
         state.stats = await api('/stats');
-        renderJobs();
-        renderApplications();
+        syncImpactMetrics();
       }
 
       async function loadJobs({ autoSeed = true } = {}) {
