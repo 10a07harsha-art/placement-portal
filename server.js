@@ -54,7 +54,7 @@ const verifyToken = (req, res, next) => {
 };
 
 app.get("/", (req, res) => {
-    res.send("Backend Running");
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.get("/seed-jobs", async (req, res) => {

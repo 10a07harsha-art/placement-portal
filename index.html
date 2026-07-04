@@ -11,14 +11,17 @@
     <title>Placement Portal | Your Career Starts Here</title>
     <style>
       :root {
-        --bg: #08111f;
+        --bg: #060b16;
+        --bg-2: #0b1220;
         --panel: rgba(255, 255, 255, 0.08);
         --panel-strong: rgba(255, 255, 255, 0.12);
-        --text: #eef2ff;
-        --muted: #b7c2d8;
-        --accent: #74d3ff;
-        --accent-2: #8b5cf6;
         --border: rgba(255, 255, 255, 0.14);
+        --text: #eef2ff;
+        --muted: #aab6d0;
+        --accent: #72d8ff;
+        --accent-2: #8a63ff;
+        --good: #6ee7b7;
+        --warn: #fbbf24;
       }
 
       * {
@@ -31,13 +34,13 @@
 
       body {
         margin: 0;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        min-height: 100vh;
         color: var(--text);
         background:
-          radial-gradient(circle at top left, rgba(116, 211, 255, 0.18), transparent 35%),
-          radial-gradient(circle at top right, rgba(139, 92, 246, 0.18), transparent 30%),
-          linear-gradient(180deg, #0b1220 0%, #08111f 55%, #050914 100%);
-        min-height: 100vh;
+          radial-gradient(circle at top left, rgba(114, 216, 255, 0.18), transparent 30%),
+          radial-gradient(circle at top right, rgba(138, 99, 255, 0.16), transparent 26%),
+          linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       }
 
       a {
@@ -45,10 +48,15 @@
         text-decoration: none;
       }
 
+      button,
+      input {
+        font: inherit;
+      }
+
       .page {
-        width: min(1120px, calc(100% - 32px));
+        width: min(1180px, calc(100% - 32px));
         margin: 0 auto;
-        padding: 24px 0 64px;
+        padding: 24px 0 56px;
       }
 
       .topbar {
@@ -56,19 +64,30 @@
         align-items: center;
         justify-content: space-between;
         gap: 16px;
-        padding: 12px 18px;
-        border: 1px solid var(--border);
-        background: rgba(4, 10, 22, 0.72);
-        backdrop-filter: blur(16px);
-        border-radius: 20px;
         position: sticky;
         top: 16px;
         z-index: 10;
+        padding: 14px 18px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: rgba(5, 10, 20, 0.72);
+        backdrop-filter: blur(18px);
       }
 
       .brand {
-        font-weight: 700;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .brand strong {
+        font-size: 1rem;
         letter-spacing: 0.02em;
+      }
+
+      .brand span {
+        color: var(--muted);
+        font-size: 0.92rem;
       }
 
       .nav {
@@ -81,23 +100,22 @@
 
       .hero {
         display: grid;
-        grid-template-columns: 1.3fr 0.9fr;
-        gap: 24px;
-        align-items: stretch;
-        padding: 72px 0 36px;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 22px;
+        padding: 28px 0 14px;
       }
 
-      .hero__copy,
+      .panel,
       .card {
         border: 1px solid var(--border);
+        border-radius: 26px;
         background: linear-gradient(180deg, var(--panel), rgba(255, 255, 255, 0.05));
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
         backdrop-filter: blur(18px);
-        border-radius: 28px;
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
       }
 
-      .hero__copy {
-        padding: 34px;
+      .panel {
+        padding: 30px;
       }
 
       .eyebrow {
@@ -106,44 +124,51 @@
         gap: 8px;
         padding: 8px 12px;
         border-radius: 999px;
-        background: rgba(116, 211, 255, 0.12);
+        background: rgba(114, 216, 255, 0.12);
         color: #dff7ff;
-        font-size: 0.85rem;
-        letter-spacing: 0.08em;
         text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.78rem;
       }
 
       h1 {
-        margin: 18px 0 12px;
+        margin: 18px 0 14px;
         font-size: clamp(2.8rem, 6vw, 5.4rem);
         line-height: 0.95;
       }
 
       .lead {
         margin: 0;
-        max-width: 62ch;
+        max-width: 65ch;
         color: var(--muted);
-        font-size: 1.05rem;
-        line-height: 1.7;
+        font-size: 1.02rem;
+        line-height: 1.72;
       }
 
-      .actions {
+      .hero-actions,
+      .toolbar,
+      .form-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-        margin-top: 28px;
+      }
+
+      .hero-actions {
+        margin-top: 26px;
       }
 
       .btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 48px;
-        padding: 0 18px;
+        min-height: 46px;
+        padding: 0 16px;
         border-radius: 999px;
         border: 1px solid var(--border);
-        font-weight: 600;
-        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        cursor: pointer;
+        transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
       }
 
       .btn:hover {
@@ -151,16 +176,17 @@
       }
 
       .btn--primary {
-        background: linear-gradient(135deg, var(--accent), var(--accent-2));
-        color: #08111f;
         border-color: transparent;
+        color: #06101d;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        font-weight: 700;
       }
 
-      .btn--ghost {
+      .btn--soft {
         background: rgba(255, 255, 255, 0.04);
       }
 
-      .hero__side {
+      .hero-grid {
         display: grid;
         gap: 16px;
       }
@@ -177,14 +203,39 @@
 
       .metric strong {
         display: block;
-        font-size: 1.8rem;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
+        font-size: 1.6rem;
       }
 
       .metric span,
       .section p,
-      .section li {
+      .section li,
+      .muted {
         color: var(--muted);
+      }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+
+      .status strong {
+        color: var(--text);
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--good);
+        box-shadow: 0 0 0 6px rgba(110, 231, 183, 0.12);
+        flex: 0 0 auto;
       }
 
       .section {
@@ -192,8 +243,20 @@
       }
 
       .section h2 {
-        margin: 0 0 18px;
+        margin: 0 0 14px;
         font-size: clamp(1.6rem, 3vw, 2.4rem);
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 18px;
+      }
+
+      .section-copy {
+        max-width: 72ch;
       }
 
       .grid {
@@ -201,45 +264,162 @@
         gap: 16px;
       }
 
-      .features {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+      .auth-grid,
+      .portal-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .jobs-grid,
+      .apps-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .card {
-        padding: 24px;
+        padding: 22px;
       }
 
       .card h3 {
         margin: 0 0 10px;
-        font-size: 1.1rem;
+        font-size: 1.08rem;
       }
 
-      .stats {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+      .job-meta,
+      .app-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 14px 0 18px;
       }
 
-      .stat {
-        text-align: center;
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        font-size: 0.9rem;
       }
 
-      .stat strong {
-        display: block;
-        font-size: 2rem;
-        margin-bottom: 8px;
+      .pill--accent {
+        border-color: rgba(114, 216, 255, 0.28);
+        background: rgba(114, 216, 255, 0.08);
+      }
+
+      .pill--warn {
+        border-color: rgba(251, 191, 36, 0.24);
+        background: rgba(251, 191, 36, 0.08);
+      }
+
+      .pill--good {
+        border-color: rgba(110, 231, 183, 0.24);
+        background: rgba(110, 231, 183, 0.08);
+      }
+
+      .form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .field {
+        display: grid;
+        gap: 7px;
+      }
+
+      .field label {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .field input,
+      .field textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px 14px;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.04);
+        outline: none;
+      }
+
+      .field input::file-selector-button {
+        margin-right: 12px;
+        border: 0;
+        border-radius: 999px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--text);
+        cursor: pointer;
+      }
+
+      .field textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+      .empty-state {
+        padding: 22px;
+        border-radius: 18px;
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .app-row {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 16px;
       }
 
       .footer {
         margin-top: 28px;
-        padding: 20px 0 0;
+        padding-top: 20px;
         color: var(--muted);
         font-size: 0.95rem;
       }
 
-      @media (max-width: 900px) {
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%);
+        padding: 12px 16px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(8, 15, 28, 0.92);
+        color: var(--text);
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      .toast.is-visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-6px);
+      }
+
+      @media (max-width: 980px) {
         .hero,
-        .features,
-        .stats {
+        .auth-grid,
+        .portal-grid,
+        .jobs-grid,
+        .apps-grid,
+        .metric-grid {
           grid-template-columns: 1fr;
+        }
+
+        .section-head {
+          align-items: start;
+          flex-direction: column;
         }
 
         .topbar {
@@ -251,105 +431,493 @@
   <body>
     <div class="page">
       <header class="topbar">
-        <div class="brand">Placement Portal</div>
+        <div class="brand">
+          <strong>Placement Portal</strong>
+          <span>Jobs, applications, and recruiter access in one place</span>
+        </div>
         <nav class="nav" aria-label="Primary">
-          <a href="#features">Features</a>
-          <a href="#stats">Statistics</a>
+          <a href="#jobs">Jobs</a>
+          <a href="#auth">Account</a>
+          <a href="#applications">My applications</a>
           <a href="#contact">Contact</a>
         </nav>
       </header>
 
       <main>
-        <section class="hero" id="home">
-          <div class="hero__copy">
-            <div class="eyebrow">Your Career Starts Here</div>
-            <h1>Launch your career with clarity.</h1>
+        <section class="hero">
+          <div class="panel">
+            <div class="eyebrow">Placement Portal</div>
+            <h1>Find jobs. Apply fast. Track your progress.</h1>
             <p class="lead">
-              Placement Portal helps students discover opportunities, track applications, and connect with recruiters in one clean workflow.
+              This portal connects students to demo jobs, application tracking, and simple recruiter workflows.
+              Sign up or log in, load the job board, and apply with a resume in a few clicks.
             </p>
-            <div class="actions">
-              <a class="btn btn--primary" href="#features">Get Started</a>
-              <a class="btn btn--ghost" href="#contact">Contact Support</a>
+            <div class="hero-actions">
+              <a class="btn btn--primary" href="#jobs">Browse jobs</a>
+              <button class="btn btn--soft" id="seedDemoBtn" type="button">Load demo jobs</button>
+              <button class="btn btn--soft" id="refreshBtn" type="button">Refresh</button>
+            </div>
+            <div style="margin-top:18px" class="status" id="statusBar">
+              <span class="status-dot" aria-hidden="true"></span>
+              <div><strong>Ready.</strong> Load demo jobs if the board is empty.</div>
             </div>
           </div>
 
-          <div class="hero__side">
-            <div class="card metric-grid" aria-label="Highlights">
+          <div class="hero-grid">
+            <div class="panel metric-grid">
               <div class="metric">
-                <strong>Smart</strong>
-                <span>Job matching</span>
+                <strong id="jobsCount">0</strong>
+                <span>Open jobs</span>
+              </div>
+              <div class="metric">
+                <strong id="appsCount">0</strong>
+                <span>My applications</span>
+              </div>
+              <div class="metric">
+                <strong>1-click</strong>
+                <span>Resume upload</span>
               </div>
               <div class="metric">
                 <strong>Live</strong>
-                <span>Application tracking</span>
-              </div>
-              <div class="metric">
-                <strong>Direct</strong>
-                <span>Recruiter connections</span>
-              </div>
-              <div class="metric">
-                <strong>Fast</strong>
-                <span>Career workflows</span>
+                <span>API-backed board</span>
               </div>
             </div>
-            <div class="card">
-              <h3>Built for momentum</h3>
-              <p>
-                A simple starting point for students who want to move quickly from search to application to interview.
+            <div class="status">
+              <span class="status-dot" aria-hidden="true"></span>
+              <div>
+                <strong id="sessionState">Guest mode.</strong>
+                <span class="muted">Sign in to apply and view your applications.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="auth">
+          <div class="section-head">
+            <div class="section-copy">
+              <div class="eyebrow">Account</div>
+              <h2>Sign up or log in to apply</h2>
+              <p class="lead">
+                Student accounts unlock resume uploads and application history. This demo uses the backend already in the repo.
               </p>
             </div>
           </div>
-        </section>
 
-        <section class="section" id="features">
-          <h2>Why choose our portal?</h2>
-          <div class="grid features">
+          <div class="grid auth-grid">
             <article class="card">
-              <h3>Smart Job Matching</h3>
-              <p>Recommendations that align opportunities with your profile and goals.</p>
+              <h3>Sign up</h3>
+              <form class="form" id="signupForm">
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="signupFirstName">First name</label>
+                    <input id="signupFirstName" name="firstName" autocomplete="given-name" required />
+                  </div>
+                  <div class="field">
+                    <label for="signupLastName">Last name</label>
+                    <input id="signupLastName" name="lastName" autocomplete="family-name" required />
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="signupEmail">Email</label>
+                  <input id="signupEmail" type="email" name="email" autocomplete="email" required />
+                </div>
+                <div class="field">
+                  <label for="signupPhone">Phone</label>
+                  <input id="signupPhone" name="phone" autocomplete="tel" />
+                </div>
+                <div class="field">
+                  <label for="signupPassword">Password</label>
+                  <input id="signupPassword" type="password" name="password" autocomplete="new-password" required />
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn--primary" type="submit">Create account</button>
+                </div>
+              </form>
             </article>
+
             <article class="card">
-              <h3>Real-time Analytics</h3>
-              <p>Track applications, company insights, and progress with minimal effort.</p>
-            </article>
-            <article class="card">
-              <h3>Direct Connections</h3>
-              <p>Stay close to recruiters and hiring managers without unnecessary friction.</p>
+              <h3>Log in</h3>
+              <form class="form" id="loginForm">
+                <div class="field">
+                  <label for="loginEmail">Email</label>
+                  <input id="loginEmail" type="email" name="email" autocomplete="email" required />
+                </div>
+                <div class="field">
+                  <label for="loginPassword">Password</label>
+                  <input id="loginPassword" type="password" name="password" autocomplete="current-password" required />
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn--primary" type="submit">Log in</button>
+                  <button class="btn btn--soft" id="logoutBtn" type="button">Log out</button>
+                </div>
+              </form>
             </article>
           </div>
         </section>
 
-        <section class="section" id="stats">
-          <h2>Our impact</h2>
-          <div class="grid stats">
-            <article class="card stat">
-              <strong>500+</strong>
-              <span>Companies</span>
-            </article>
-            <article class="card stat">
-              <strong>10,000+</strong>
-              <span>Students Placed</span>
-            </article>
-            <article class="card stat">
-              <strong>95%</strong>
-              <span>Success Rate</span>
-            </article>
-            <article class="card stat">
-              <strong>24/7</strong>
-              <span>Support</span>
-            </article>
+        <section class="section" id="jobs">
+          <div class="section-head">
+            <div class="section-copy">
+              <div class="eyebrow">Open roles</div>
+              <h2>Jobs you can actually apply to</h2>
+              <p class="lead">
+                If the board is empty, the portal can seed demo jobs so the experience is immediately usable.
+              </p>
+            </div>
+            <div class="toolbar">
+              <button class="btn btn--soft" id="reloadJobsBtn" type="button">Reload jobs</button>
+            </div>
           </div>
+          <div class="grid jobs-grid" id="jobsGrid"></div>
+        </section>
+
+        <section class="section" id="applications">
+          <div class="section-head">
+            <div class="section-copy">
+              <div class="eyebrow">My applications</div>
+              <h2>Track what you’ve applied for</h2>
+              <p class="lead">
+                After logging in, you can see submitted applications and their current status.
+              </p>
+            </div>
+            <div class="toolbar">
+              <button class="btn btn--soft" id="reloadAppsBtn" type="button">Refresh applications</button>
+            </div>
+          </div>
+          <div class="grid apps-grid" id="applicationsGrid"></div>
         </section>
 
         <section class="section" id="contact">
           <div class="card">
-            <h2>Contact</h2>
-            <p>support@placementportal.com</p>
+            <div class="eyebrow">Contact</div>
+            <h2>Need help?</h2>
+            <p class="lead">This demo portal is wired to the backend routes in the repo. If you want recruiter/admin flows next, we can add them too.</p>
+            <div class="hero-actions">
+              <a class="btn btn--primary" href="mailto:support@placementportal.com">Email support</a>
+            </div>
           </div>
         </section>
       </main>
 
       <footer class="footer">© 2026 Placement Portal. All rights reserved.</footer>
     </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      const state = {
+        jobs: [],
+        applications: [],
+        token: localStorage.getItem('placement_portal_token') || ''
+      };
+
+      const els = {
+        jobsGrid: document.getElementById('jobsGrid'),
+        applicationsGrid: document.getElementById('applicationsGrid'),
+        jobsCount: document.getElementById('jobsCount'),
+        appsCount: document.getElementById('appsCount'),
+        sessionState: document.getElementById('sessionState'),
+        statusBar: document.getElementById('statusBar'),
+        toast: document.getElementById('toast'),
+        seedDemoBtn: document.getElementById('seedDemoBtn'),
+        refreshBtn: document.getElementById('refreshBtn'),
+        reloadJobsBtn: document.getElementById('reloadJobsBtn'),
+        reloadAppsBtn: document.getElementById('reloadAppsBtn'),
+        signupForm: document.getElementById('signupForm'),
+        loginForm: document.getElementById('loginForm'),
+        logoutBtn: document.getElementById('logoutBtn')
+      };
+
+      function setStatus(message, tone = 'info') {
+        els.statusBar.innerHTML = `
+          <span class="status-dot" aria-hidden="true" style="background:${tone === 'error' ? '#f87171' : tone === 'warn' ? '#fbbf24' : 'var(--good)'}"></span>
+          <div>${message}</div>
+        `;
+      }
+
+      let toastTimer = 0;
+      function showToast(message) {
+        els.toast.textContent = message;
+        els.toast.classList.add('is-visible');
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => {
+          els.toast.classList.remove('is-visible');
+        }, 2400);
+      }
+
+      function saveToken(token) {
+        state.token = token;
+        if (token) {
+          localStorage.setItem('placement_portal_token', token);
+        } else {
+          localStorage.removeItem('placement_portal_token');
+        }
+        syncSession();
+        renderJobs();
+        renderApplications();
+      }
+
+      function syncSession() {
+        if (state.token) {
+          els.sessionState.textContent = 'Logged in.';
+          setStatus('Logged in and ready to apply.', 'info');
+        } else {
+          els.sessionState.textContent = 'Guest mode.';
+        }
+      }
+
+      async function api(path, options = {}) {
+        const headers = new Headers(options.headers || {});
+        const isFormData = options.body instanceof FormData;
+
+        if (state.token) {
+          headers.set('Authorization', state.token);
+        }
+
+        if (!isFormData && options.body && !headers.has('Content-Type')) {
+          headers.set('Content-Type', 'application/json');
+        }
+
+        const response = await fetch(path, {
+          ...options,
+          headers
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json')
+          ? await response.json()
+          : await response.text();
+
+        if (!response.ok) {
+          throw new Error((data && data.message) || (data && data.error) || 'Request failed');
+        }
+
+        return data;
+      }
+
+      function jobCard(job) {
+        const canApply = Boolean(state.token);
+        return `
+          <article class="card">
+            <div class="job-meta">
+              <span class="pill pill--accent">${job.company || 'Company'}</span>
+              <span class="pill">${job.location || 'Location'}</span>
+              ${job.salary ? `<span class="pill pill--warn">${job.salary}</span>` : ''}
+            </div>
+            <h3>${job.title}</h3>
+            <p>${job.description || 'No description provided yet.'}</p>
+            ${
+              canApply
+                ? `
+                  <form class="form apply-form" data-job-id="${job._id}">
+                    <div class="field">
+                      <label>Resume</label>
+                      <input type="file" name="resume" accept=".pdf,.doc,.docx,image/*" />
+                    </div>
+                    <div class="form-actions">
+                      <button class="btn btn--primary" type="submit">Apply now</button>
+                    </div>
+                  </form>
+                `
+                : `
+                  <div class="empty-state">
+                    Log in to apply for this role and upload your resume.
+                  </div>
+                `
+            }
+          </article>
+        `;
+      }
+
+      function applicationCard(app) {
+        const title = app.jobId?.title || 'Job';
+        const company = app.jobId?.company || 'Company';
+        return `
+          <article class="card">
+            <div class="app-row">
+              <div>
+                <div class="job-meta">
+                  <span class="pill pill--good">${app.status || 'Pending'}</span>
+                  <span class="pill">${company}</span>
+                </div>
+                <h3>${title}</h3>
+                <p class="muted">Resume: ${app.resume || 'Not uploaded'}</p>
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
+      function renderJobs() {
+        els.jobsCount.textContent = String(state.jobs.length);
+        if (!state.jobs.length) {
+          els.jobsGrid.innerHTML = `
+            <div class="empty-state">
+              No jobs are available right now. Click <strong>Load demo jobs</strong> to seed sample roles.
+            </div>
+          `;
+          return;
+        }
+
+        els.jobsGrid.innerHTML = state.jobs.map(jobCard).join('');
+        document.querySelectorAll('.apply-form').forEach((form) => {
+          form.addEventListener('submit', handleApply);
+        });
+      }
+
+      function renderApplications() {
+        els.appsCount.textContent = String(state.applications.length);
+        if (!state.token) {
+          els.applicationsGrid.innerHTML = `
+            <div class="empty-state">
+              Log in to view your applications.
+            </div>
+          `;
+          return;
+        }
+
+        if (!state.applications.length) {
+          els.applicationsGrid.innerHTML = `
+            <div class="empty-state">
+              You haven’t applied to any jobs yet.
+            </div>
+          `;
+          return;
+        }
+
+        els.applicationsGrid.innerHTML = state.applications.map(applicationCard).join('');
+      }
+
+      async function loadJobs({ autoSeed = true } = {}) {
+        try {
+          state.jobs = await api('/jobs');
+          if (!state.jobs.length && autoSeed) {
+            setStatus('No jobs yet. Seeding demo roles so the portal is usable.', 'warn');
+            await api('/seed-jobs');
+            state.jobs = await api('/jobs');
+          }
+          renderJobs();
+          setStatus(state.jobs.length ? 'Jobs loaded successfully.' : 'No jobs available yet.', 'info');
+        } catch (error) {
+          setStatus(`Failed to load jobs: ${error.message}`, 'error');
+          showToast(error.message);
+          els.jobsGrid.innerHTML = `
+            <div class="empty-state">
+              Could not load jobs. Check the backend connection and try again.
+            </div>
+          `;
+        }
+      }
+
+      async function loadApplications() {
+        if (!state.token) {
+          state.applications = [];
+          renderApplications();
+          return;
+        }
+
+        try {
+          state.applications = await api('/my-applications');
+          renderApplications();
+        } catch (error) {
+          state.applications = [];
+          renderApplications();
+          showToast(error.message);
+        }
+      }
+
+      async function handleSignup(event) {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const payload = Object.fromEntries(formData.entries());
+
+        try {
+          const result = await api('/signup', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          showToast(result.message || 'Signup complete');
+          event.currentTarget.reset();
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      async function handleLogin(event) {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const payload = Object.fromEntries(formData.entries());
+
+        try {
+          const result = await api('/login', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          saveToken(result.token);
+          showToast('Logged in successfully');
+          await loadApplications();
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      async function handleApply(event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const jobId = form.dataset.jobId;
+        const fileInput = form.querySelector('input[type="file"]');
+        const formData = new FormData();
+        formData.append('jobId', jobId);
+        if (fileInput?.files?.[0]) {
+          formData.append('resume', fileInput.files[0]);
+        }
+
+        try {
+          const result = await api('/apply-job', {
+            method: 'POST',
+            body: formData
+          });
+          showToast(result.message || 'Applied successfully');
+          await loadApplications();
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      function bindControls() {
+        els.seedDemoBtn.addEventListener('click', async () => {
+          try {
+            setStatus('Seeding demo jobs...', 'warn');
+            await api('/seed-jobs');
+            await loadJobs({ autoSeed: false });
+            showToast('Demo jobs loaded');
+          } catch (error) {
+            showToast(error.message);
+          }
+        });
+
+        const refreshAll = async () => {
+          await loadJobs();
+          await loadApplications();
+        };
+
+        els.refreshBtn.addEventListener('click', refreshAll);
+        els.reloadJobsBtn.addEventListener('click', () => loadJobs({ autoSeed: false }));
+        els.reloadAppsBtn.addEventListener('click', loadApplications);
+        els.signupForm.addEventListener('submit', handleSignup);
+        els.loginForm.addEventListener('submit', handleLogin);
+        els.logoutBtn.addEventListener('click', () => {
+          saveToken('');
+          loadApplications();
+          showToast('Logged out');
+        });
+      }
+
+      bindControls();
+      syncSession();
+      renderApplications();
+      loadJobs();
+      loadApplications();
+    </script>
   </body>
 </html>
